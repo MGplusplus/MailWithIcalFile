@@ -354,8 +354,8 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		// craeting client secret object.
 		clientSecret = GoogleClientSecrets.load(JSON_FACTORY,
 				new InputStreamReader(inputStream, "UTF-8"));
-
-		//Path pathToCodeLocation = Paths.get(MailWithIcal.class.getResource("/").toURI());
+		
+		//accessing the locations of files.
 		tokenLocResource = pathTillCodeDirectory + "/resources/tokens";
 
 		newLocTokenTmp = "/tmp/tokens";
