@@ -109,8 +109,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		// sendEmailWithCalFile funtion is sending an email with an ical
 		// Attachment file.
 		try {
-			sendEmailWithCalFile(loginUserName, loginPassword, senderName, recipientName, recipientEmail, eventStartHr,
-					eventStartMin, eventLocation);
+			sendEmailWithCalFile(loginUserName, loginPassword, senderName, recipientName, recipientEmail, eventLocation);
 		} catch (AddressException e) {
 			e.printStackTrace();
 		} catch (MessagingException e) {
@@ -177,7 +176,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		// initialize an event..
 		event.getProperties().getProperty(Property.DTSTART).getParameters().add(Value.DATE);
 		event.getProperties().add(new Location(evenLocation));
-		event.getProperties().add(new Description("Hello " + recepientName + ", You have an appointment"));
+		event.getProperties().add(new Description("Hello " + recepientName + ", You have an appointment."));
 
 		eventUid = new UidGenerator("1");
 
@@ -197,7 +196,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 	}
 
 	public void sendEmailWithCalFile(String userName, String password, String senderName, String recepientName,
-			String recipientEmail, String startHr, String startMin, String location)
+			String recipientEmail, String location)
 			throws AddressException, MessagingException {
 		
 		Properties props = null;
@@ -223,7 +222,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		});
 		
 		message = new MimeMessage(session);
-		message.setFrom(new InternetAddress(recipientEmail));
+		//message.setFrom(new InternetAddress(recipientEmail));
 		message.setRecipients(RecipientType.TO, InternetAddress.parse(recipientEmail));
 		message.addRecipient(RecipientType.BCC, new InternetAddress("dummydump101@gmail.com"));
 		message.addRecipient(RecipientType.CC, new InternetAddress("dummydump101@gmail.com"));
@@ -244,7 +243,8 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		// creating body of email.
 		content = new MimeBodyPart();
 		content.setContent("Hello " + recepientName + ", <html><br></html>We confirm your appointment at our "
-				+ location + " office" + ".<html><br></html>Thank you for choosing us.", "text/html");
+				+location+ " office.<html><br></html>Thank you for choosing us.<html><br><br></html>"
+				+"Regards,<html><br></html>"+senderName+".", "text/html");
 		multipart.addBodyPart(content);
 		message.setContent(multipart);
 
@@ -257,9 +257,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 			throws GeneralSecurityException, IOException, URISyntaxException {
 
 		final String applicationName = "Google Calendar";
-		final String tokensDirectoryPath = "tokens";
 		final List<String> scopes = Collections.singletonList(CalendarScopes.CALENDAR);
-		final String credentialsFilePath = "/credentials_For_GoogleCaljson.json";
 		final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 		Calendar service = null;
@@ -276,7 +274,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		
 		// Build a new authorized API client service.
 		service = new Calendar.Builder(httpTransport, jsonFactory,
-				getCredentials(httpTransport, jsonFactory, scopes, tokensDirectoryPath, credentialsFilePath))
+				getCredentials(httpTransport, jsonFactory, scopes))
 						.setApplicationName(applicationName).build();
 
 		// Creating an Google calendar simple Event for google api.
@@ -322,7 +320,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 	}
 
 	static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, JsonFactory JSON_FACTORY,
-			final List<String> SCOPES, final String TOKENS_DIRECTORY_PATH, final String CREDENTIALS_FILE_PATH)
+			final List<String> SCOPES)
 			throws IOException, URISyntaxException {
 		/**
 		 * Reading the token available in resources directory and copying the
@@ -347,8 +345,8 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		googleCredentialLocation = pathTillCodeDirectory + "/resources/credentials_For_GoogleCal.json";
 
 		fileInputStream = new FileInputStream(googleCredentialLocation);
-		// converting Fileinputstream to Inputstream, it needs to done
-		// explicitly otherwise sometime lambda function give error.
+		/* Cnverting Fileinputstream to Inputstream, it needs to done explicitly otherwise sometime
+		 *  lambda function give error.*/
 		inputStream = fileInputStream;
 
 		// craeting client secret object.
