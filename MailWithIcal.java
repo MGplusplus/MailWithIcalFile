@@ -51,7 +51,6 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
 
@@ -84,7 +83,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		String recipientName = (String) input.get("recipientName");
 		String recipientEmail = (String) input.get("recipientEmail");
 		String eventName = (String) input.get("eventName");
-		String eventLocation = (String) input.get("location");
+		String eventLocation = (String) input.get("location"); 
 		String month = (String) input.get("month");
 		String date = (String) input.get("date");
 		String year = (String) input.get("year");
@@ -93,8 +92,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		String eventEndHr = (String) input.get("endHr");
 		String eventEndMin = (String) input.get("endMin");
 
-		// createCalendar function is to create a calendar object and save an
-		// ical file in /tmp folder of AWS.
+		// createCalendar function is to create a calendar object and save an ical file in /tmp folder of AWS.
 		try {
 			createCalendar(month, date, year, eventName, recipientName, eventLocation, eventStartHr, eventStartMin,
 					eventEndHr, eventEndMin);
@@ -106,8 +104,7 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 			e.printStackTrace();
 		}
 
-		// sendEmailWithCalFile funtion is sending an email with an ical
-		// Attachment file.
+		// sendEmailWithCalFile function is sending an email with an ical attachment file.
 		try {
 			sendEmailWithCalFile(loginUserName, loginPassword, senderName, recipientName, recipientEmail, eventLocation);
 		} catch (AddressException e) {
@@ -161,8 +158,6 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 				simpleDateFormat.parse(
 					month + "-" + date + "-" + year + " " + eventStartHr + ":" + eventStartMin + ":" + "00"));
 		java.util.Calendar endCal = java.util.Calendar.getInstance(timezone);
-
-		//SimpleDateFormat sdfDate = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
 
 		endCal.setTime(
 				simpleDateFormat.parse(
@@ -266,8 +261,6 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 		com.google.api.client.util.DateTime endDateTime = null;
 		EventDateTime start = null;
 		EventDateTime end = null;
-		String[] recurrence = null;
-		EventAttendee[] attendees = null;
 		EventReminder[] reminderOverrides = null;
 		Event.Reminders reminders = null;
 		String calendarId = null;
@@ -278,8 +271,8 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 						.setApplicationName(applicationName).build();
 
 		// Creating an Google calendar simple Event for google api.
-		event = new Event().setSummary("Hello Sir, This is very urgent.").setLocation("GNR-Gandhinagar, Gujrat")
-				.setDescription("Important Meeting for the developers");
+		event = new Event().setSummary(eventName).setLocation(location)
+				.setDescription("Hello Alan, You have an appointment.");
 
 		// Setting the start time of the event.
 		startDateTime = new com.google.api.client.util.DateTime(
@@ -293,15 +286,6 @@ public class MailWithIcal implements RequestHandler<JSONObject, String> {
 				year + "-" + month + "-" + date + "T" + endHr + ":" + endMin + ":00+05:30");
 		end = new EventDateTime().setDateTime(endDateTime).setTimeZone("GMT");
 		event.setEnd(end);
-
-		// Setting the recurrence of event to count 2 on daily basis
-		recurrence = new String[] { "RRULE:FREQ=DAILY;COUNT=2" };
-		event.setRecurrence(Arrays.asList(recurrence));
-
-		// Adding the Event Attendees.
-		attendees = new EventAttendee[] { new EventAttendee().setEmail("khushal@example.com"),
-				new EventAttendee().setEmail("mohit@example.com"), };
-		event.setAttendees(Arrays.asList(attendees));
 
 		// setting the reminder in event.
 		reminderOverrides = new EventReminder[] {
